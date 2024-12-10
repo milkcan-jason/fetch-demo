@@ -37,9 +37,7 @@ class LandingScreenViewModelTest {
     fun filter_isCorrect() = runTest {
         val vm = LandingScreenViewModel(DummyRepo())
         val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            vm.uiState.collect {
-                println("Size: ${it?.results?.size}")
-            }
+            vm.uiState.collect {}
         }
 
         // delay waiting on second StateFlow response. Didn't stack flows to Repo for demo purposes.
@@ -80,6 +78,30 @@ class LandingScreenViewModelTest {
         job.cancel()
     }
 
+    @Test
+    fun filter_stringOrder() = runTest {
+        val vm = LandingScreenViewModel(StringRepo())
+        val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            vm.uiState.collect {}
+        }
+
+        // delay waiting on second StateFlow response. Didn't stack flows to Repo for demo purposes.
+        while (vm.uiState.value == null) {
+            delay(100L)
+        }
+
+        vm.uiState.value?.results?.let { results ->
+            assert(
+                value = results[1]?.get(0)?.name == "Test 1",
+                lazyMessage = { "Test 1 should be First" })
+            assert(
+                value = results[1]?.get(2)?.name == "Test 120",
+                lazyMessage = { "Test 120 should be Last" })
+        }
+
+        job.cancel()
+    }
+
     class DummyRepo: FetchRepository() {
         override suspend fun loadData(): List<FetchData>  = withContext(Dispatchers.Main) {
             // dummy data to wire up infrastructure
@@ -92,6 +114,19 @@ class LandingScreenViewModelTest {
                 val itr = FetchData(id = i, listId = i%2, name = name)
                 data.add(itr)
             }
+
+            return@withContext data
+        }
+    }
+
+    class StringRepo: FetchRepository() {
+        override suspend fun loadData(): List<FetchData>  = withContext(Dispatchers.Main) {
+            val data: MutableList<FetchData> = mutableListOf()
+
+            // This order is used to verify we order them properly for display
+            data.add(FetchData(id = 1, listId = 1, name = "Test 120"))
+            data.add(FetchData(id = 1, listId = 1, name = "Test 12"))
+            data.add(FetchData(id = 2, listId = 1, name = "Test 1"))
 
             return@withContext data
         }

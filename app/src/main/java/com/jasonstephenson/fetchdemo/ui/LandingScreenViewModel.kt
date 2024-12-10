@@ -24,7 +24,8 @@ class LandingScreenViewModel(
             // then sort by listId, then name
             val sortedList = result.filter {
                 !it.name.isNullOrEmpty()
-            }.sortedWith(compareBy({it.listId}, {it.name} ))
+            }.sortedWith(compareBy({it.listId}, {it.name?.length}, {it.name} ))
+            // I could do a more thorough job on the string check, but length looks to work for this use-case
 
             // group the sorted list into groups by listId
             val grouped = sortedList.groupBy { selector ->
