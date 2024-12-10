@@ -104,7 +104,6 @@ class LandingScreenViewModelTest {
 
     class DummyRepo: FetchRepository() {
         override suspend fun loadData(): List<FetchData>  = withContext(Dispatchers.Main) {
-            // dummy data to wire up infrastructure
             val data: MutableList<FetchData> = mutableListOf()
             // Count down to verify order
             for(i in 5 downTo 1) {
