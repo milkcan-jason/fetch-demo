@@ -67,9 +67,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    /** GSON **/
+    implementation("com.google.code.gson:gson:2.11.0")
+
     /** Retrofit **/
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
-
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
 
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 }
